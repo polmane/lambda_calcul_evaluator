@@ -16,8 +16,8 @@ public class lcParser extends Parser {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, LLETRA=8, NOMMAC=9, 
-		INFIX=10, WS=11;
+		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, LLETRA=8, MACRO=9, 
+		INMACRO=10, WS=11;
 	public static final int
 		RULE_root = 0, RULE_terme = 1, RULE_conj = 2;
 	private static String[] makeRuleNames() {
@@ -36,7 +36,7 @@ public class lcParser extends Parser {
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
 	private static String[] makeSymbolicNames() {
 		return new String[] {
-			null, null, null, null, null, null, null, null, "LLETRA", "NOMMAC", "INFIX", 
+			null, null, null, null, null, null, null, null, "LLETRA", "MACRO", "INMACRO", 
 			"WS"
 		};
 	}
@@ -102,18 +102,18 @@ public class lcParser extends Parser {
 			super.copyFrom(ctx);
 		}
 	}
-	public static class RoottermContext extends RootContext {
+	public static class TermrootContext extends RootContext {
 		public TermeContext terme() {
 			return getRuleContext(TermeContext.class,0);
 		}
-		public RoottermContext(RootContext ctx) { copyFrom(ctx); }
+		public TermrootContext(RootContext ctx) { copyFrom(ctx); }
 	}
 	public static class DefmacContext extends RootContext {
 		public TermeContext terme() {
 			return getRuleContext(TermeContext.class,0);
 		}
-		public TerminalNode NOMMAC() { return getToken(lcParser.NOMMAC, 0); }
-		public TerminalNode INFIX() { return getToken(lcParser.INFIX, 0); }
+		public TerminalNode MACRO() { return getToken(lcParser.MACRO, 0); }
+		public TerminalNode INMACRO() { return getToken(lcParser.INMACRO, 0); }
 		public DefmacContext(RootContext ctx) { copyFrom(ctx); }
 	}
 
@@ -124,26 +124,22 @@ public class lcParser extends Parser {
 		try {
 			setState(10);
 			_errHandler.sync(this);
-			switch (_input.LA(1)) {
-			case T__2:
-			case T__4:
-			case T__5:
-			case LLETRA:
-				_localctx = new RoottermContext(_localctx);
+			switch ( getInterpreter().adaptivePredict(_input,0,_ctx) ) {
+			case 1:
+				_localctx = new TermrootContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
 				setState(6);
 				terme(0);
 				}
 				break;
-			case NOMMAC:
-			case INFIX:
+			case 2:
 				_localctx = new DefmacContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
 				setState(7);
 				_la = _input.LA(1);
-				if ( !(_la==NOMMAC || _la==INFIX) ) {
+				if ( !(_la==MACRO || _la==INMACRO) ) {
 				_errHandler.recoverInline(this);
 				}
 				else {
@@ -165,8 +161,6 @@ public class lcParser extends Parser {
 				terme(0);
 				}
 				break;
-			default:
-				throw new NoViableAltException(this);
 			}
 		}
 		catch (RecognitionException re) {
@@ -219,6 +213,20 @@ public class lcParser extends Parser {
 		}
 		public TermContext(TermeContext ctx) { copyFrom(ctx); }
 	}
+	public static class InfixContext extends TermeContext {
+		public List<TermeContext> terme() {
+			return getRuleContexts(TermeContext.class);
+		}
+		public TermeContext terme(int i) {
+			return getRuleContext(TermeContext.class,i);
+		}
+		public TerminalNode INMACRO() { return getToken(lcParser.INMACRO, 0); }
+		public InfixContext(TermeContext ctx) { copyFrom(ctx); }
+	}
+	public static class MacContext extends TermeContext {
+		public TerminalNode MACRO() { return getToken(lcParser.MACRO, 0); }
+		public MacContext(TermeContext ctx) { copyFrom(ctx); }
+	}
 
 	public final TermeContext terme() throws RecognitionException {
 		return terme(0);
@@ -236,20 +244,29 @@ public class lcParser extends Parser {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(23);
+			setState(24);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
+			case MACRO:
+				{
+				_localctx = new MacContext(_localctx);
+				_ctx = _localctx;
+				_prevctx = _localctx;
+
+				setState(13);
+				match(MACRO);
+				}
+				break;
 			case T__2:
 				{
 				_localctx = new TermContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-
-				setState(13);
-				match(T__2);
 				setState(14);
-				terme(0);
+				match(T__2);
 				setState(15);
+				terme(0);
+				setState(16);
 				match(T__3);
 				}
 				break;
@@ -259,7 +276,7 @@ public class lcParser extends Parser {
 				_localctx = new AbsContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(17);
+				setState(18);
 				_la = _input.LA(1);
 				if ( !(_la==T__4 || _la==T__5) ) {
 				_errHandler.recoverInline(this);
@@ -269,11 +286,11 @@ public class lcParser extends Parser {
 					_errHandler.reportMatch(this);
 					consume();
 				}
-				setState(18);
-				conj();
 				setState(19);
-				match(T__6);
+				conj();
 				setState(20);
+				match(T__6);
+				setState(21);
 				terme(2);
 				}
 				break;
@@ -282,7 +299,7 @@ public class lcParser extends Parser {
 				_localctx = new LetterContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(22);
+				setState(23);
 				match(LLETRA);
 				}
 				break;
@@ -290,27 +307,45 @@ public class lcParser extends Parser {
 				throw new NoViableAltException(this);
 			}
 			_ctx.stop = _input.LT(-1);
-			setState(29);
+			setState(33);
 			_errHandler.sync(this);
-			_alt = getInterpreter().adaptivePredict(_input,2,_ctx);
+			_alt = getInterpreter().adaptivePredict(_input,3,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					if ( _parseListeners!=null ) triggerExitRuleEvent();
 					_prevctx = _localctx;
 					{
-					{
-					_localctx = new AppContext(new TermeContext(_parentctx, _parentState));
-					pushNewRecursionContext(_localctx, _startState, RULE_terme);
-					setState(25);
-					if (!(precpred(_ctx, 3))) throw new FailedPredicateException(this, "precpred(_ctx, 3)");
-					setState(26);
-					terme(4);
+					setState(31);
+					_errHandler.sync(this);
+					switch ( getInterpreter().adaptivePredict(_input,2,_ctx) ) {
+					case 1:
+						{
+						_localctx = new InfixContext(new TermeContext(_parentctx, _parentState));
+						pushNewRecursionContext(_localctx, _startState, RULE_terme);
+						setState(26);
+						if (!(precpred(_ctx, 5))) throw new FailedPredicateException(this, "precpred(_ctx, 5)");
+						setState(27);
+						match(INMACRO);
+						setState(28);
+						terme(6);
+						}
+						break;
+					case 2:
+						{
+						_localctx = new AppContext(new TermeContext(_parentctx, _parentState));
+						pushNewRecursionContext(_localctx, _startState, RULE_terme);
+						setState(29);
+						if (!(precpred(_ctx, 3))) throw new FailedPredicateException(this, "precpred(_ctx, 3)");
+						setState(30);
+						terme(4);
+						}
+						break;
 					}
 					} 
 				}
-				setState(31);
+				setState(35);
 				_errHandler.sync(this);
-				_alt = getInterpreter().adaptivePredict(_input,2,_ctx);
+				_alt = getInterpreter().adaptivePredict(_input,3,_ctx);
 			}
 			}
 		}
@@ -343,17 +378,17 @@ public class lcParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(33); 
+			setState(37); 
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			do {
 				{
 				{
-				setState(32);
+				setState(36);
 				match(LLETRA);
 				}
 				}
-				setState(35); 
+				setState(39); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			} while ( _la==LLETRA );
@@ -380,24 +415,27 @@ public class lcParser extends Parser {
 	private boolean terme_sempred(TermeContext _localctx, int predIndex) {
 		switch (predIndex) {
 		case 0:
+			return precpred(_ctx, 5);
+		case 1:
 			return precpred(_ctx, 3);
 		}
 		return true;
 	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\r(\4\2\t\2\4\3\t"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\r,\4\2\t\2\4\3\t"+
 		"\3\4\4\t\4\3\2\3\2\3\2\3\2\5\2\r\n\2\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3"+
-		"\3\3\3\3\3\5\3\32\n\3\3\3\3\3\7\3\36\n\3\f\3\16\3!\13\3\3\4\6\4$\n\4\r"+
-		"\4\16\4%\3\4\2\3\4\5\2\4\6\2\5\3\2\13\f\3\2\3\4\3\2\7\b\2)\2\f\3\2\2\2"+
-		"\4\31\3\2\2\2\6#\3\2\2\2\b\r\5\4\3\2\t\n\t\2\2\2\n\13\t\3\2\2\13\r\5\4"+
-		"\3\2\f\b\3\2\2\2\f\t\3\2\2\2\r\3\3\2\2\2\16\17\b\3\1\2\17\20\7\5\2\2\20"+
-		"\21\5\4\3\2\21\22\7\6\2\2\22\32\3\2\2\2\23\24\t\4\2\2\24\25\5\6\4\2\25"+
-		"\26\7\t\2\2\26\27\5\4\3\4\27\32\3\2\2\2\30\32\7\n\2\2\31\16\3\2\2\2\31"+
-		"\23\3\2\2\2\31\30\3\2\2\2\32\37\3\2\2\2\33\34\f\5\2\2\34\36\5\4\3\6\35"+
-		"\33\3\2\2\2\36!\3\2\2\2\37\35\3\2\2\2\37 \3\2\2\2 \5\3\2\2\2!\37\3\2\2"+
-		"\2\"$\7\n\2\2#\"\3\2\2\2$%\3\2\2\2%#\3\2\2\2%&\3\2\2\2&\7\3\2\2\2\6\f"+
-		"\31\37%";
+		"\3\3\3\3\3\3\3\5\3\33\n\3\3\3\3\3\3\3\3\3\3\3\7\3\"\n\3\f\3\16\3%\13\3"+
+		"\3\4\6\4(\n\4\r\4\16\4)\3\4\2\3\4\5\2\4\6\2\5\3\2\13\f\3\2\3\4\3\2\7\b"+
+		"\2/\2\f\3\2\2\2\4\32\3\2\2\2\6\'\3\2\2\2\b\r\5\4\3\2\t\n\t\2\2\2\n\13"+
+		"\t\3\2\2\13\r\5\4\3\2\f\b\3\2\2\2\f\t\3\2\2\2\r\3\3\2\2\2\16\17\b\3\1"+
+		"\2\17\33\7\13\2\2\20\21\7\5\2\2\21\22\5\4\3\2\22\23\7\6\2\2\23\33\3\2"+
+		"\2\2\24\25\t\4\2\2\25\26\5\6\4\2\26\27\7\t\2\2\27\30\5\4\3\4\30\33\3\2"+
+		"\2\2\31\33\7\n\2\2\32\16\3\2\2\2\32\20\3\2\2\2\32\24\3\2\2\2\32\31\3\2"+
+		"\2\2\33#\3\2\2\2\34\35\f\7\2\2\35\36\7\f\2\2\36\"\5\4\3\b\37 \f\5\2\2"+
+		" \"\5\4\3\6!\34\3\2\2\2!\37\3\2\2\2\"%\3\2\2\2#!\3\2\2\2#$\3\2\2\2$\5"+
+		"\3\2\2\2%#\3\2\2\2&(\7\n\2\2\'&\3\2\2\2()\3\2\2\2)\'\3\2\2\2)*\3\2\2\2"+
+		"*\7\3\2\2\2\7\f\32!#)";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

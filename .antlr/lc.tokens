@@ -6,8 +6,8 @@ T__4=5
 T__5=6
 T__6=7
 LLETRA=8
-NOMMAC=9
-INFIX=10
+MACRO=9
+INMACRO=10
 WS=11
 '≡'=1
 '='=2

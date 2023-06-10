@@ -9,8 +9,8 @@ else:
 
 class lcVisitor(ParseTreeVisitor):
 
-    # Visit a parse tree produced by lcParser#rootterm.
-    def visitRootterm(self, ctx:lcParser.RoottermContext):
+    # Visit a parse tree produced by lcParser#termroot.
+    def visitTermroot(self, ctx:lcParser.TermrootContext):
         return self.visitChildren(ctx)
 
 
@@ -36,6 +36,16 @@ class lcVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by lcParser#term.
     def visitTerm(self, ctx:lcParser.TermContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by lcParser#infix.
+    def visitInfix(self, ctx:lcParser.InfixContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by lcParser#mac.
+    def visitMac(self, ctx:lcParser.MacContext):
         return self.visitChildren(ctx)
 
 

@@ -21,7 +21,15 @@ class Abstraction:
 
 Terme = Letter | Application | Abstraction
 
+macros = dict()
+
 class TreeVisitor(lcVisitor):
+    # Visit a parse tree produced by lcParser#defmac.
+    def visitDefmac(self, ctx):
+        [nameDef, equal, term] = list(ctx.getChildren())
+        macros[nameDef.getText()] = self.visit(term)
+        return 'defMacro'
+
     # Visit a parse tree produced by lcParser#app.
     def visitApp(self, ctx):
         [leftTerm, rightTerm] = list(ctx.getChildren())
@@ -37,14 +45,33 @@ class TreeVisitor(lcVisitor):
         return abs
 
     # Visit a parse tree produced by lcParser#letter.
-    def visitLetter(self, ctx:lcParser.LetterContext):
+    def visitLetter(self, ctx):
         [letter] = list(ctx.getChildren())
         return Letter(letter.getText())
 
     # Visit a parse tree produced by lcParser#term.
-    def visitTerm(self, ctx:lcParser.TermContext):
+    def visitTerm(self, ctx):
         [p1, term, p2] = list(ctx.getChildren())
         return self.visit(term)
+    
+    # Visit a parse tree produced by lcParser#infix.
+    def visitInfix(self, ctx):
+        [term1, infix, term2] = list(ctx.getChildren())
+        infixTerm = macros[infix.getText()]
+        exprTerm1 = self.visit(term1)
+        exprTerm2 = self.visit(term2)
+        return Application(Application(infixTerm, exprTerm1), exprTerm2)
+
+    # Visit a parse tree produced by lcParser#mac.
+    def visitMac(self, ctx):
+        [name] = list(ctx.getChildren())
+        return macros[name.getText()]
+
+def macrosToStr(macros):
+    sequence = ''
+    for name, term in macros.items():
+        sequence = sequence + name + ' ≡ ' + treeToStr(term) +'\n'
+    return sequence
 
 def treeToStr(tree):
     match tree:
@@ -198,6 +225,9 @@ while True:
         #Visitor
         visitor = TreeVisitor()
         expression = visitor.visit(tree)
+        if expression == 'defMacro':
+            print(macrosToStr(macros), end='')
+            continue
         print('Arbre: \n' + treeToStr(expression))
 
         #Evaluator

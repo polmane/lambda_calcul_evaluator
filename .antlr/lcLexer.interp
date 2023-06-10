@@ -22,8 +22,8 @@ null
 null
 null
 LLETRA
-NOMMAC
-INFIX
+MACRO
+INMACRO
 WS
 
 rule names:
@@ -35,8 +35,8 @@ T__4
 T__5
 T__6
 LLETRA
-NOMMAC
-INFIX
+MACRO
+INMACRO
 WS
 
 channel names:

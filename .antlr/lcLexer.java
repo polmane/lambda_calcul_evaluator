@@ -16,8 +16,8 @@ public class lcLexer extends Lexer {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, LLETRA=8, NOMMAC=9, 
-		INFIX=10, WS=11;
+		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, LLETRA=8, MACRO=9, 
+		INMACRO=10, WS=11;
 	public static String[] channelNames = {
 		"DEFAULT_TOKEN_CHANNEL", "HIDDEN"
 	};
@@ -28,8 +28,8 @@ public class lcLexer extends Lexer {
 
 	private static String[] makeRuleNames() {
 		return new String[] {
-			"T__0", "T__1", "T__2", "T__3", "T__4", "T__5", "T__6", "LLETRA", "NOMMAC", 
-			"INFIX", "WS"
+			"T__0", "T__1", "T__2", "T__3", "T__4", "T__5", "T__6", "LLETRA", "MACRO", 
+			"INMACRO", "WS"
 		};
 	}
 	public static final String[] ruleNames = makeRuleNames();
@@ -43,7 +43,7 @@ public class lcLexer extends Lexer {
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
 	private static String[] makeSymbolicNames() {
 		return new String[] {
-			null, null, null, null, null, null, null, null, "LLETRA", "NOMMAC", "INFIX", 
+			null, null, null, null, null, null, null, null, "LLETRA", "MACRO", "INMACRO", 
 			"WS"
 		};
 	}

@@ -45,8 +45,8 @@ class lcLexer(Lexer):
     T__5 = 6
     T__6 = 7
     LLETRA = 8
-    NOMMAC = 9
-    INFIX = 10
+    MACRO = 9
+    INMACRO = 10
     WS = 11
 
     channelNames = [ u"DEFAULT_TOKEN_CHANNEL", u"HIDDEN" ]
@@ -57,10 +57,10 @@ class lcLexer(Lexer):
             "'\\u2261'", "'='", "'('", "')'", "'\\u03BB'", "'\\'", "'.'" ]
 
     symbolicNames = [ "<INVALID>",
-            "LLETRA", "NOMMAC", "INFIX", "WS" ]
+            "LLETRA", "MACRO", "INMACRO", "WS" ]
 
     ruleNames = [ "T__0", "T__1", "T__2", "T__3", "T__4", "T__5", "T__6", 
-                  "LLETRA", "NOMMAC", "INFIX", "WS" ]
+                  "LLETRA", "MACRO", "INMACRO", "WS" ]
 
     grammarFileName = "lc.g4"
 
