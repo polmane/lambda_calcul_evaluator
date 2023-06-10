@@ -60,9 +60,9 @@ def evalExpr(expr):
         case Application(left, right):
             match left:
                 case Abstraction(var, absTerm):
-                    [converted, absConverted, conversion] = alphaconversion(var, absTerm, right)
+                    [converted, absConverted] = alphaconversion(var, absTerm, right)
                     if converted:
-                        reduction = 'α-conversió:\n' + alphaconversion
+                        reduction = 'α-conversió:\n' + treeToStr(left) + ' → ' + treeToStr(absConverted)
                         return True, Application(absConverted, right), reduction
                     else:
                         reducedExpr = betareduction(var, absTerm, right)
@@ -87,15 +87,12 @@ def evalExpr(expr):
 def betareduction(var, absTerm, subs):
     match absTerm:
         case Application(left, right):
-            [redLeft, reductionL] = betareduction(var, left, subs)
-            [redRight, reductionR] = betareduction(var, right, subs)
-            
-            # if reductionL == 'beta' or reductionR == 'beta':
-            #     reduction = 'beta'
+            redLeft= betareduction(var, left, subs)
+            redRight = betareduction(var, right, subs)
             return  Application(redLeft, redRight)
         case Abstraction(absVar, term):
             if var != absVar:
-                [redTerm, reduction] = betareduction(var, term, subs)
+                redTerm= betareduction(var, term, subs)
                 return Abstraction(absVar, redTerm)
             else:
                 return Abstraction(absVar, term)
@@ -111,25 +108,34 @@ def alphaconversion(var, absTerm, rightTerm):
 
     BVabs, usedVarsAbs= boundVariables(Abstraction(var, absTerm))
     if BVabs.count(var) > 1:    #En l'abstraccio hi ha solapament de variables lligades
-        freeNames = abc - usedVarsAbs
-        oneName = freeNames.pop()
-        renamedTerm, conversio = rename(absTerm, var, oneName, False)
-        return True, Abstraction(var, renamedTerm), conversio
+        freeLetters = sorted(abc - usedVarsAbs)
+        freshLetter = getNextFreeLetter(var, freeLetters)
+        renamedTerm = rename(absTerm, var, freshLetter, False)
+        return True, Abstraction(var, renamedTerm)
     else:
         FVright, usedVarsRTerm = freeVariables(rightTerm)
 
-        freeNames = abc - (usedVarsAbs | usedVarsRTerm)
+        freeLetters = sorted(abc - (usedVarsAbs | usedVarsRTerm))
         conflictVars = FVright & set(BVabs)
 
         if conflictVars == set(): #Conjunt buit, no hi ha conflictes, retornem original
-            return False, absTerm
+            return False, Abstraction(var, absTerm)
         else: #Hi ha conflictes, resolem UN conflicte, canviant la primera variable de l'abstraccio que estigui en el conflicte
             oneConflict = conflictVars.pop()
-            oneName = freeNames.pop()
-            renamedAbs, conversio = rename(Abstraction(var, absTerm), oneConflict, oneName, False)
-            return True, renamedAbs, conversio
+            freshLetter = getNextFreeLetter(var, freeLetters)
+            renamedAbs = rename(Abstraction(var, absTerm), oneConflict, freshLetter, False)
+            return True, renamedAbs
 
-
+def getNextFreeLetter(letter, freeLetters):
+    first = True
+    firstFree = freeLetters.pop()
+    for free in freeLetters:
+        if first:
+            firstFree = free
+            first = False
+        if free > letter:
+            return free
+    return firstFree
 #Funcio que retorna les variables lliures d'un terme, i les utilitzades (lligades o lliures)
 def freeVariables(term):
     match term:
@@ -158,32 +164,32 @@ def boundVariables(term):
 def rename(term, conflict, newName, found):
     match term:
         case Application(left, right):
-            newLeft, conversioL = rename(left, conflict, newName, found)
-            newRight, conversioR = rename(right, conflict, newName, found)
-            conversio = None
-            if conversioL != None and conversioR != None:
-                conversio = treeToStr(term) + ' → ' + treeToStr(Application(newLeft, newRight))
-            elif conversioL == None and conversioR != None:
-                conversio = conversioR
-            elif conversioL != None and conversioR == None:
-                conversio = conversioL
-            return Application(newLeft, newRight), conversio
-        case Abstraction(var, term):
+            newLeft = rename(left, conflict, newName, found)
+            newRight = rename(right, conflict, newName, found)
+            # conversio = None
+            # if conversioL != None and conversioR != None:
+            #     conversio = treeToStr(term) + ' → ' + treeToStr(Application(newLeft, newRight))
+            # elif conversioL == None and conversioR != None:
+            #     conversio = conversioR
+            # elif conversioL != None and conversioR == None:
+            #     conversio = conversioL
+            return Application(newLeft, newRight)
+        case Abstraction(var, absTerm):
             if var == conflict and not found:
-                newTerm, conversio = rename(term, conflict, newName, True)
-                conversio = treeToStr(term) + ' → ' + treeToStr(newTerm)
-                return Abstraction(newName, newTerm), conversio
+                newTerm = rename(absTerm, conflict, newName, True)
+                # conversio = treeToStr(term) + ' → ' + treeToStr(newTerm)
+                return Abstraction(newName, newTerm)
             elif var == conflict and found:
-                return Abstraction(var, term), None
+                return Abstraction(var, absTerm)
             else:
-                newTerm, conversio = rename(term, conflict, newName, found)
-                return Abstraction(var, newTerm), conversio
+                newTerm = rename(absTerm, conflict, newName, found)
+                return Abstraction(var, newTerm)
 
         case Letter(letter):
             if found and letter == conflict:
-                return Letter(newName), None
+                return Letter(newName)
             else:
-                return Letter(letter), None
+                return Letter(letter)
 
 
 while True:
