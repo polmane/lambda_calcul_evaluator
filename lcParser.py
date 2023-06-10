@@ -1,27 +1,28 @@
-# Generated from lc.g4 by ANTLR 4.7.2
+# Generated from lc.g4 by ANTLR 4.13.0
 # encoding: utf-8
 from antlr4 import *
 from io import StringIO
-from typing.io import TextIO
 import sys
+if sys.version_info[1] > 5:
+	from typing import TextIO
+else:
+	from typing.io import TextIO
 
 def serializedATN():
-    with StringIO() as buf:
-        buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\t")
-        buf.write("$\4\2\t\2\4\3\t\3\4\4\t\4\3\2\3\2\3\3\3\3\3\3\3\3\3\3")
-        buf.write("\3\3\3\3\3\3\3\3\3\3\3\3\5\3\26\n\3\3\3\3\3\7\3\32\n\3")
-        buf.write("\f\3\16\3\35\13\3\3\4\6\4 \n\4\r\4\16\4!\3\4\2\3\4\5\2")
-        buf.write("\4\6\2\3\3\2\5\6\2$\2\b\3\2\2\2\4\25\3\2\2\2\6\37\3\2")
-        buf.write("\2\2\b\t\5\4\3\2\t\3\3\2\2\2\n\13\b\3\1\2\13\f\7\3\2\2")
-        buf.write("\f\r\5\4\3\2\r\16\7\4\2\2\16\26\3\2\2\2\17\20\t\2\2\2")
-        buf.write("\20\21\5\6\4\2\21\22\7\7\2\2\22\23\5\4\3\4\23\26\3\2\2")
-        buf.write("\2\24\26\7\b\2\2\25\n\3\2\2\2\25\17\3\2\2\2\25\24\3\2")
-        buf.write("\2\2\26\33\3\2\2\2\27\30\f\5\2\2\30\32\5\4\3\6\31\27\3")
-        buf.write("\2\2\2\32\35\3\2\2\2\33\31\3\2\2\2\33\34\3\2\2\2\34\5")
-        buf.write("\3\2\2\2\35\33\3\2\2\2\36 \7\b\2\2\37\36\3\2\2\2 !\3\2")
-        buf.write("\2\2!\37\3\2\2\2!\"\3\2\2\2\"\7\3\2\2\2\5\25\33!")
-        return buf.getvalue()
-
+    return [
+        4,1,11,38,2,0,7,0,2,1,7,1,2,2,7,2,1,0,1,0,1,0,1,0,3,0,11,8,0,1,1,
+        1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,3,1,24,8,1,1,1,1,1,5,1,28,
+        8,1,10,1,12,1,31,9,1,1,2,4,2,34,8,2,11,2,12,2,35,1,2,0,1,2,3,0,2,
+        4,0,3,1,0,9,10,1,0,1,2,1,0,5,6,39,0,10,1,0,0,0,2,23,1,0,0,0,4,33,
+        1,0,0,0,6,11,3,2,1,0,7,8,7,0,0,0,8,9,7,1,0,0,9,11,3,2,1,0,10,6,1,
+        0,0,0,10,7,1,0,0,0,11,1,1,0,0,0,12,13,6,1,-1,0,13,14,5,3,0,0,14,
+        15,3,2,1,0,15,16,5,4,0,0,16,24,1,0,0,0,17,18,7,2,0,0,18,19,3,4,2,
+        0,19,20,5,7,0,0,20,21,3,2,1,2,21,24,1,0,0,0,22,24,5,8,0,0,23,12,
+        1,0,0,0,23,17,1,0,0,0,23,22,1,0,0,0,24,29,1,0,0,0,25,26,10,3,0,0,
+        26,28,3,2,1,4,27,25,1,0,0,0,28,31,1,0,0,0,29,27,1,0,0,0,29,30,1,
+        0,0,0,30,3,1,0,0,0,31,29,1,0,0,0,32,34,5,8,0,0,33,32,1,0,0,0,34,
+        35,1,0,0,0,35,33,1,0,0,0,35,36,1,0,0,0,36,5,1,0,0,0,4,10,23,29,35
+    ]
 
 class lcParser ( Parser ):
 
@@ -33,10 +34,12 @@ class lcParser ( Parser ):
 
     sharedContextCache = PredictionContextCache()
 
-    literalNames = [ "<INVALID>", "'('", "')'", "'\u03BB'", "'\\'", "'.'" ]
+    literalNames = [ "<INVALID>", "'\\u2261'", "'='", "'('", "')'", "'\\u03BB'", 
+                     "'\\'", "'.'" ]
 
     symbolicNames = [ "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
-                      "<INVALID>", "<INVALID>", "LLETRA", "WS" ]
+                      "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
+                      "LLETRA", "NOMMAC", "INFIX", "WS" ]
 
     RULE_root = 0
     RULE_terme = 1
@@ -50,36 +53,75 @@ class lcParser ( Parser ):
     T__2=3
     T__3=4
     T__4=5
-    LLETRA=6
-    WS=7
+    T__5=6
+    T__6=7
+    LLETRA=8
+    NOMMAC=9
+    INFIX=10
+    WS=11
 
     def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
         super().__init__(input, output)
-        self.checkVersion("4.7.2")
+        self.checkVersion("4.13.0")
         self._interp = ParserATNSimulator(self, self.atn, self.decisionsToDFA, self.sharedContextCache)
         self._predicates = None
 
 
 
+
     class RootContext(ParserRuleContext):
+        __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
 
-        def terme(self):
-            return self.getTypedRuleContext(lcParser.TermeContext,0)
-
 
         def getRuleIndex(self):
             return lcParser.RULE_root
 
+     
+        def copyFrom(self, ctx:ParserRuleContext):
+            super().copyFrom(ctx)
+
+
+
+    class RoottermContext(RootContext):
+
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a lcParser.RootContext
+            super().__init__(parser)
+            self.copyFrom(ctx)
+
+        def terme(self):
+            return self.getTypedRuleContext(lcParser.TermeContext,0)
+
+
         def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitRoot" ):
-                return visitor.visitRoot(self)
+            if hasattr( visitor, "visitRootterm" ):
+                return visitor.visitRootterm(self)
             else:
                 return visitor.visitChildren(self)
 
+
+    class DefmacContext(RootContext):
+
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a lcParser.RootContext
+            super().__init__(parser)
+            self.copyFrom(ctx)
+
+        def terme(self):
+            return self.getTypedRuleContext(lcParser.TermeContext,0)
+
+        def NOMMAC(self):
+            return self.getToken(lcParser.NOMMAC, 0)
+        def INFIX(self):
+            return self.getToken(lcParser.INFIX, 0)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitDefmac" ):
+                return visitor.visitDefmac(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -87,10 +129,40 @@ class lcParser ( Parser ):
 
         localctx = lcParser.RootContext(self, self._ctx, self.state)
         self.enterRule(localctx, 0, self.RULE_root)
+        self._la = 0 # Token type
         try:
-            self.enterOuterAlt(localctx, 1)
-            self.state = 6
-            self.terme(0)
+            self.state = 10
+            self._errHandler.sync(self)
+            token = self._input.LA(1)
+            if token in [3, 5, 6, 8]:
+                localctx = lcParser.RoottermContext(self, localctx)
+                self.enterOuterAlt(localctx, 1)
+                self.state = 6
+                self.terme(0)
+                pass
+            elif token in [9, 10]:
+                localctx = lcParser.DefmacContext(self, localctx)
+                self.enterOuterAlt(localctx, 2)
+                self.state = 7
+                _la = self._input.LA(1)
+                if not(_la==9 or _la==10):
+                    self._errHandler.recoverInline(self)
+                else:
+                    self._errHandler.reportMatch(self)
+                    self.consume()
+                self.state = 8
+                _la = self._input.LA(1)
+                if not(_la==1 or _la==2):
+                    self._errHandler.recoverInline(self)
+                else:
+                    self._errHandler.reportMatch(self)
+                    self.consume()
+                self.state = 9
+                self.terme(0)
+                pass
+            else:
+                raise NoViableAltException(self)
+
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -99,7 +171,9 @@ class lcParser ( Parser ):
             self.exitRule()
         return localctx
 
+
     class TermeContext(ParserRuleContext):
+        __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
@@ -198,53 +272,53 @@ class lcParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 19
+            self.state = 23
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [lcParser.T__0]:
+            if token in [3]:
                 localctx = lcParser.TermContext(self, localctx)
                 self._ctx = localctx
                 _prevctx = localctx
 
-                self.state = 9
-                self.match(lcParser.T__0)
-                self.state = 10
+                self.state = 13
+                self.match(lcParser.T__2)
+                self.state = 14
                 self.terme(0)
-                self.state = 11
-                self.match(lcParser.T__1)
+                self.state = 15
+                self.match(lcParser.T__3)
                 pass
-            elif token in [lcParser.T__2, lcParser.T__3]:
+            elif token in [5, 6]:
                 localctx = lcParser.AbsContext(self, localctx)
                 self._ctx = localctx
                 _prevctx = localctx
-                self.state = 13
+                self.state = 17
                 _la = self._input.LA(1)
-                if not(_la==lcParser.T__2 or _la==lcParser.T__3):
+                if not(_la==5 or _la==6):
                     self._errHandler.recoverInline(self)
                 else:
                     self._errHandler.reportMatch(self)
                     self.consume()
-                self.state = 14
+                self.state = 18
                 self.conj()
-                self.state = 15
-                self.match(lcParser.T__4)
-                self.state = 16
+                self.state = 19
+                self.match(lcParser.T__6)
+                self.state = 20
                 self.terme(2)
                 pass
-            elif token in [lcParser.LLETRA]:
+            elif token in [8]:
                 localctx = lcParser.LetterContext(self, localctx)
                 self._ctx = localctx
                 _prevctx = localctx
-                self.state = 18
+                self.state = 22
                 self.match(lcParser.LLETRA)
                 pass
             else:
                 raise NoViableAltException(self)
 
             self._ctx.stop = self._input.LT(-1)
-            self.state = 25
+            self.state = 29
             self._errHandler.sync(self)
-            _alt = self._interp.adaptivePredict(self._input,1,self._ctx)
+            _alt = self._interp.adaptivePredict(self._input,2,self._ctx)
             while _alt!=2 and _alt!=ATN.INVALID_ALT_NUMBER:
                 if _alt==1:
                     if self._parseListeners is not None:
@@ -252,15 +326,15 @@ class lcParser ( Parser ):
                     _prevctx = localctx
                     localctx = lcParser.AppContext(self, lcParser.TermeContext(self, _parentctx, _parentState))
                     self.pushNewRecursionContext(localctx, _startState, self.RULE_terme)
-                    self.state = 21
+                    self.state = 25
                     if not self.precpred(self._ctx, 3):
                         from antlr4.error.Errors import FailedPredicateException
                         raise FailedPredicateException(self, "self.precpred(self._ctx, 3)")
-                    self.state = 22
+                    self.state = 26
                     self.terme(4) 
-                self.state = 27
+                self.state = 31
                 self._errHandler.sync(self)
-                _alt = self._interp.adaptivePredict(self._input,1,self._ctx)
+                _alt = self._interp.adaptivePredict(self._input,2,self._ctx)
 
         except RecognitionException as re:
             localctx.exception = re
@@ -270,7 +344,9 @@ class lcParser ( Parser ):
             self.unrollRecursionContexts(_parentctx)
         return localctx
 
+
     class ConjContext(ParserRuleContext):
+        __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
@@ -301,16 +377,16 @@ class lcParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 29 
+            self.state = 33 
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             while True:
-                self.state = 28
+                self.state = 32
                 self.match(lcParser.LLETRA)
-                self.state = 31 
+                self.state = 35 
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                if not (_la==lcParser.LLETRA):
+                if not (_la==8):
                     break
 
         except RecognitionException as re:

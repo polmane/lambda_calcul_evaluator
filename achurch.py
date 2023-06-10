@@ -95,6 +95,7 @@ def betareduction(var, absTerm, subs):
                 redTerm= betareduction(var, term, subs)
                 return Abstraction(absVar, redTerm)
             else:
+                #Per si de cas, però l'alfa-conversio se n'hauria d'encarregar
                 return Abstraction(absVar, term)
         case Letter(letter):
             if letter == var:
@@ -107,7 +108,8 @@ def alphaconversion(var, absTerm, rightTerm):
     abc = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'}
 
     BVabs, usedVarsAbs= boundVariables(Abstraction(var, absTerm))
-    if BVabs.count(var) > 1:    #En l'abstraccio hi ha solapament de variables lligades
+    if BVabs.count(var) > 1:    
+        #En l'abstraccio hi ha solapament de variables lligades
         freeLetters = sorted(abc - usedVarsAbs)
         freshLetter = getNextFreeLetter(var, freeLetters)
         renamedTerm = rename(absTerm, var, freshLetter, False)
@@ -118,9 +120,11 @@ def alphaconversion(var, absTerm, rightTerm):
         freeLetters = sorted(abc - (usedVarsAbs | usedVarsRTerm))
         conflictVars = FVright & set(BVabs)
 
-        if conflictVars == set(): #Conjunt buit, no hi ha conflictes, retornem original
+        if conflictVars == set(): 
+            #Conjunt buit, no hi ha conflictes, retornem original
             return False, Abstraction(var, absTerm)
-        else: #Hi ha conflictes, resolem UN conflicte, canviant la primera variable de l'abstraccio que estigui en el conflicte
+        else: 
+            #Hi ha conflictes, resolem UN conflicte, canviant la primera variable de l'abstraccio que estigui en el conflicte
             oneConflict = conflictVars.pop()
             freshLetter = getNextFreeLetter(var, freeLetters)
             renamedAbs = rename(Abstraction(var, absTerm), oneConflict, freshLetter, False)
@@ -136,6 +140,7 @@ def getNextFreeLetter(letter, freeLetters):
         if free > letter:
             return free
     return firstFree
+
 #Funcio que retorna les variables lliures d'un terme, i les utilitzades (lligades o lliures)
 def freeVariables(term):
     match term:
@@ -166,25 +171,16 @@ def rename(term, conflict, newName, found):
         case Application(left, right):
             newLeft = rename(left, conflict, newName, found)
             newRight = rename(right, conflict, newName, found)
-            # conversio = None
-            # if conversioL != None and conversioR != None:
-            #     conversio = treeToStr(term) + ' → ' + treeToStr(Application(newLeft, newRight))
-            # elif conversioL == None and conversioR != None:
-            #     conversio = conversioR
-            # elif conversioL != None and conversioR == None:
-            #     conversio = conversioL
             return Application(newLeft, newRight)
         case Abstraction(var, absTerm):
             if var == conflict and not found:
                 newTerm = rename(absTerm, conflict, newName, True)
-                # conversio = treeToStr(term) + ' → ' + treeToStr(newTerm)
                 return Abstraction(newName, newTerm)
             elif var == conflict and found:
                 return Abstraction(var, absTerm)
             else:
                 newTerm = rename(absTerm, conflict, newName, found)
                 return Abstraction(var, newTerm)
-
         case Letter(letter):
             if found and letter == conflict:
                 return Letter(newName)
@@ -203,6 +199,7 @@ while True:
         visitor = TreeVisitor()
         expression = visitor.visit(tree)
         print('Arbre: \n' + treeToStr(expression))
+
         #Evaluator
         maxReductions = 10 #Maximum limit of reductions 
 

@@ -1,6 +1,6 @@
-# Generated from lc.g4 by ANTLR 4.7.2
+# Generated from lc.g4 by ANTLR 4.13.0
 from antlr4 import *
-if __name__ is not None and "." in __name__:
+if "." in __name__:
     from .lcParser import lcParser
 else:
     from lcParser import lcParser
@@ -9,8 +9,13 @@ else:
 
 class lcVisitor(ParseTreeVisitor):
 
-    # Visit a parse tree produced by lcParser#root.
-    def visitRoot(self, ctx:lcParser.RootContext):
+    # Visit a parse tree produced by lcParser#rootterm.
+    def visitRootterm(self, ctx:lcParser.RoottermContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by lcParser#defmac.
+    def visitDefmac(self, ctx:lcParser.DefmacContext):
         return self.visitChildren(ctx)
 
 
