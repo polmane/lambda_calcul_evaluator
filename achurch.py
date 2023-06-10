@@ -63,13 +63,11 @@ def evalExpr(expr):
                     [converted, absConverted, conversion] = alphaconversion(var, absTerm, right)
                     if converted:
                         reduction = 'α-conversió:\n' + alphaconversion
-                        return True, Application(absConverted, subs), reduction
+                        return True, Application(absConverted, right), reduction
                     else:
                         reducedExpr = betareduction(var, absTerm, right)
                         reduction = 'β-reducció:\n' + treeToStr(expr) + ' → ' + treeToStr(reducedExpr)
                         return True, reducedExpr, reduction
-                        
-                            
                 case _:
                     [reduced, redLeft, reduction] = evalExpr(left)
                     if (reduced):
