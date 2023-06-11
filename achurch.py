@@ -1,3 +1,4 @@
+######################### IMPORTS #########################
 from __future__ import annotations
 from dataclasses import dataclass
 from antlr4 import *
@@ -7,6 +8,8 @@ from lcVisitor import lcVisitor
 import logging
 from telegram import Update
 from telegram.ext import filters, MessageHandler, ApplicationBuilder, CommandHandler, ContextTypes
+
+######################### CLASSES i VARIABLES #########################
 
 @dataclass
 class Letter:
@@ -24,13 +27,15 @@ class Abstraction:
 
 Terme = Letter | Application | Abstraction
 
-macros = dict()
+macrosDictionary = dict()
+
+######################### VISITOR #########################
 
 class TreeVisitor(lcVisitor):
     # Visit a parse tree produced by lcParser#defmac.
     def visitDefmac(self, ctx):
         [nameDef, equal, term] = list(ctx.getChildren())
-        macros[nameDef.getText()] = self.visit(term)
+        macrosDictionary[nameDef.getText()] = self.visit(term)
         return 'defMacro'
 
     # Visit a parse tree produced by lcParser#app.
@@ -60,7 +65,7 @@ class TreeVisitor(lcVisitor):
     # Visit a parse tree produced by lcParser#infix.
     def visitInfix(self, ctx):
         [term1, infix, term2] = list(ctx.getChildren())
-        infixTerm = macros[infix.getText()]
+        infixTerm = macrosDictionary[infix.getText()]
         exprTerm1 = self.visit(term1)
         exprTerm2 = self.visit(term2)
         return Application(Application(infixTerm, exprTerm1), exprTerm2)
@@ -68,14 +73,21 @@ class TreeVisitor(lcVisitor):
     # Visit a parse tree produced by lcParser#mac.
     def visitMac(self, ctx):
         [name] = list(ctx.getChildren())
-        return macros[name.getText()]
+        return macrosDictionary[name.getText()]
+    
+######################### PROGRAMA PYTHON #########################
 
-def macrosToStr(macros):
-    sequence = ''
-    for name, term in macros.items():
-        sequence = sequence + name + ' ≡ ' + treeToStr(term) +'\n'
-    return sequence
+# Concatena els les claus i valors d'un diccionari "macrosIn" en una única string
+def macrosToStr(macrosIn):
+    if not bool(macrosIn):
+        return 'No hi ha macros definides'
+    else:
+        sequence = ''
+        for name, term in macrosIn.items():
+            sequence = sequence + name + ' ≡ ' + treeToStr(term) +'\n'
+        return sequence
 
+# Donat una expressió en forma de arbre (definit com a Terme a dalt), retorna un string amb la representació d'arbre parentitzat
 def treeToStr(tree):
     match tree:
         case Application(left, right):
@@ -85,6 +97,10 @@ def treeToStr(tree):
         case Letter(letter):
             return letter
 
+# Avalua una expressió (Terme) i si pot aplica UNA transformació i retorna tres variables:
+    # reduced: Boolea que indica si ha patit UNA transformació (beta-reduccio o alfa-conversió)
+    # reducedExpr: L'expressió transformada/reduida si s'escau, sinó serà la mateixa que d'entrada
+    # reduction: Un string que representaa la reducció aplicada
 def evalExpr(expr):
     match expr:
         case Application(left, right):
@@ -114,6 +130,7 @@ def evalExpr(expr):
         case Letter(letter):
             return False, Letter(letter), ''
 
+# Funció que retorna l'expressió amb la beta reducció aplicada
 def betareduction(var, absTerm, subs):
     match absTerm:
         case Application(left, right):
@@ -133,7 +150,8 @@ def betareduction(var, absTerm, subs):
             else:
                 return Letter(letter)
 
-#Funció que aplica la alfa-conversió, retorna l'ABSTRACCIO amb la conversió aplicada
+#Funció que verifica si es pot aplicar UNA alfa-conversió donat una abstracció(var i absTerm) i un terme, 
+# retorna l'ABSTRACCIO amb la conversió aplicada si s'escau, sinó retorna l'expressió d'entrada
 def alphaconversion(var, absTerm, rightTerm):
     abc = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'}
 
@@ -160,6 +178,9 @@ def alphaconversion(var, absTerm, rightTerm):
             renamedAbs = rename(Abstraction(var, absTerm), oneConflict, freshLetter, False)
             return True, renamedAbs
 
+#Funció que donada una lletra 'letter' i un conjunt ordenat de lletres,
+# retorna la següent lletra de 'letter', en ordre alfàbetic, del conjunt.
+# És un procés cíclic, la primera lletra del conjunt "serà" la següent de l'última
 def getNextFreeLetter(letter, freeLetters):
     first = True
     firstFree = freeLetters.pop()
@@ -171,7 +192,7 @@ def getNextFreeLetter(letter, freeLetters):
             return free
     return firstFree
 
-#Funcio que retorna les variables lliures d'un terme, i les utilitzades (lligades o lliures)
+#Funcio que retorna dos conjunts ('set' de python) de les variables lliures d'un terme, i les utilitzades en aquest terme(lligades o lliures), respectivament
 def freeVariables(term):
     match term:
         case Application(left , right): 
@@ -184,6 +205,7 @@ def freeVariables(term):
         case Letter(letter):
             return {letter}, {letter}
 
+# Funcio que retorna una llista ('list' de python) de les variables lligades d'un terme, i un conjunt de les utilitzades en aquest terme(lligades o lliures)
 def boundVariables(term):
     match term:
         case Abstraction(var, absTerm):
@@ -196,6 +218,9 @@ def boundVariables(term):
         case Letter(letter):
             return [], {letter}
 
+#Funció que donat un Terme/expressió una variable (en conflicte) 'conflict', un nou nom de variable 'newName', i un boolea per com a control de la recursivitat,
+# canvia les aparicions PERMESES (per això el boolea per evitar canviar variables lligades més internament que tenen el mateix nom que 'conflict'
+#  i que per tant necessitaran una posterior conversió) de la variable 'conflict' per 'newName'
 def rename(term, conflict, newName, found):
     match term:
         case Application(left, right):
@@ -204,9 +229,11 @@ def rename(term, conflict, newName, found):
             return Application(newLeft, newRight)
         case Abstraction(var, absTerm):
             if var == conflict and not found:
+                #Fiquem found a True ja que hem trobat l'abstracció a la qual farem el re-anomenament"
                 newTerm = rename(absTerm, conflict, newName, True)
                 return Abstraction(newName, newTerm)
             elif var == conflict and found:
+                # Aturem el reanomenament, doncs la variable de l'abstracció actual no es la que estem reanomenant 
                 return Abstraction(var, absTerm)
             else:
                 newTerm = rename(absTerm, conflict, newName, found)
@@ -216,46 +243,8 @@ def rename(term, conflict, newName, found):
                 return Letter(newName)
             else:
                 return Letter(letter)
-
-
-# while True:
-#     input_stream = InputStream(input('? '))
-#     lexer = lcLexer(input_stream)
-#     token_stream = CommonTokenStream(lexer)
-#     parser = lcParser(token_stream)
-#     tree = parser.root()
-#     if parser.getNumberOfSyntaxErrors() == 0:
-#         #Visitor
-#         visitor = TreeVisitor()
-#         expression = visitor.visit(tree)
-#         if expression == 'defMacro':
-#             print(macrosToStr(macros), end='')
-#             continue
-#         print('Arbre: \n' + treeToStr(expression))
-
-#         #Evaluator
-#         maxReductions = 10 #Maximum limit of reductions 
-
-#         numReduc = 0
-#         reducedExpr = expression
-#         reduced = False
-#         while numReduc < maxReductions:
-#             [reduced, reducedExpr, reduction] = evalExpr(reducedExpr)
-#             if reduced:
-#                 print(reduction)
-#                 numReduc = numReduc + 1
-#             else:
-#                 break
-#         #Result
-#         if reduced and numReduc >= maxReductions:
-#             print('Resultat:\n' + 'Nothing')
-#         else:
-#             print('Resultat:\n' + treeToStr(reducedExpr))
-
-#     else:
-#         print(parser.getNumberOfSyntaxErrors(), 'errors de sintaxi.')
-#         print(tree.toStringTree(recog=parser))
-
+            
+######################### BOT TELEGRAM #########################
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
@@ -273,10 +262,45 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def macros(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=macrosToStr(macros))
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=macrosToStr(macrosDictionary))
 
-async def read(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=update.message.text)
+async def interact(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    input_stream = InputStream(update.message.text)
+    lexer = lcLexer(input_stream)
+    token_stream = CommonTokenStream(lexer)
+    parser = lcParser(token_stream)
+    tree = parser.root()
+    if parser.getNumberOfSyntaxErrors() == 0:
+        #Visitor
+        visitor = TreeVisitor()
+        expression = visitor.visit(tree)
+        if expression != 'defMacro':
+            textExpr = 'Arbre: \n' + treeToStr(expression)
+            await context.bot.send_message(chat_id=update.effective_chat.id, text=textExpr)
+
+            #Evaluator
+            maxReductions = 10 #Maximum limit of reductions 
+
+            numReduc = 0
+            reducedExpr = expression
+            reduced = False
+            while numReduc < maxReductions:
+                [reduced, reducedExpr, reduction] = evalExpr(reducedExpr)
+                if reduced:
+                    await context.bot.send_message(chat_id=update.effective_chat.id, text=reduction)
+                    numReduc = numReduc + 1
+                else:
+                    break
+            #Result
+            if reduced and numReduc >= maxReductions:
+                await context.bot.send_message(chat_id=update.effective_chat.id, text='Resultat:\nNothing')
+            else:
+                textResult = 'Resultat:\n' + treeToStr(reducedExpr)
+                await context.bot.send_message(chat_id=update.effective_chat.id, text=textResult)
+    else:
+        syntaxError = str(parser.getNumberOfSyntaxErrors()) + ' errors de sintaxi.'
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=syntaxError)
+        # print(tree.toStringTree(recog=parser)) #Descomentar per veure per terminal l'arbre amb la gramatica
 
 if __name__ == '__main__':
     TOKEN = open('token.txt').read().strip()
@@ -288,12 +312,12 @@ if __name__ == '__main__':
     author_handler = CommandHandler('author', author)
     macros_handler = CommandHandler('macros', macros)
     #Interpreta els missatges de l'usuari que no siguin comandes i respon en conseqüència (és a dir, resol una lambda expressió)
-    read_handler = MessageHandler(filters.TEXT & (~filters.COMMAND), read)
+    interact_handler = MessageHandler(filters.TEXT & (~filters.COMMAND), interact)
 
     application.add_handler(start_handler)
     application.add_handler(help_handler)
     application.add_handler(author_handler)
     application.add_handler(macros_handler)
-    application.add_handler(read_handler)
+    application.add_handler(interact_handler)
 
     application.run_polling()
