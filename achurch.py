@@ -4,6 +4,9 @@ from antlr4 import *
 from lcLexer import lcLexer
 from lcParser import lcParser
 from lcVisitor import lcVisitor
+import logging
+from telegram import Update
+from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
 
 @dataclass
 class Letter:
@@ -215,40 +218,57 @@ def rename(term, conflict, newName, found):
                 return Letter(letter)
 
 
-while True:
-    input_stream = InputStream(input('? '))
-    lexer = lcLexer(input_stream)
-    token_stream = CommonTokenStream(lexer)
-    parser = lcParser(token_stream)
-    tree = parser.root()
-    if parser.getNumberOfSyntaxErrors() == 0:
-        #Visitor
-        visitor = TreeVisitor()
-        expression = visitor.visit(tree)
-        if expression == 'defMacro':
-            print(macrosToStr(macros), end='')
-            continue
-        print('Arbre: \n' + treeToStr(expression))
+# while True:
+#     input_stream = InputStream(input('? '))
+#     lexer = lcLexer(input_stream)
+#     token_stream = CommonTokenStream(lexer)
+#     parser = lcParser(token_stream)
+#     tree = parser.root()
+#     if parser.getNumberOfSyntaxErrors() == 0:
+#         #Visitor
+#         visitor = TreeVisitor()
+#         expression = visitor.visit(tree)
+#         if expression == 'defMacro':
+#             print(macrosToStr(macros), end='')
+#             continue
+#         print('Arbre: \n' + treeToStr(expression))
 
-        #Evaluator
-        maxReductions = 10 #Maximum limit of reductions 
+#         #Evaluator
+#         maxReductions = 10 #Maximum limit of reductions 
 
-        numReduc = 0
-        reducedExpr = expression
-        reduced = False
-        while numReduc < maxReductions:
-            [reduced, reducedExpr, reduction] = evalExpr(reducedExpr)
-            if reduced:
-                print(reduction)
-                numReduc = numReduc + 1
-            else:
-                break
-        #Result
-        if reduced and numReduc >= maxReductions:
-            print('Resultat:\n' + 'Nothing')
-        else:
-            print('Resultat:\n' + treeToStr(reducedExpr))
+#         numReduc = 0
+#         reducedExpr = expression
+#         reduced = False
+#         while numReduc < maxReductions:
+#             [reduced, reducedExpr, reduction] = evalExpr(reducedExpr)
+#             if reduced:
+#                 print(reduction)
+#                 numReduc = numReduc + 1
+#             else:
+#                 break
+#         #Result
+#         if reduced and numReduc >= maxReductions:
+#             print('Resultat:\n' + 'Nothing')
+#         else:
+#             print('Resultat:\n' + treeToStr(reducedExpr))
 
-    else:
-        print(parser.getNumberOfSyntaxErrors(), 'errors de sintaxi.')
-        print(tree.toStringTree(recog=parser))
+#     else:
+#         print(parser.getNumberOfSyntaxErrors(), 'errors de sintaxi.')
+#         print(tree.toStringTree(recog=parser))
+
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Benvingut, estas llest per fer lambda càlculs?!")
+
+if __name__ == '__main__':
+    TOKEN = open('token.txt').read().strip()
+    application = ApplicationBuilder().token(TOKEN).build()
+
+    start_handler = CommandHandler('start', start)
+    application.add_handler(start_handler)
+
+    application.run_polling()
