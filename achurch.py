@@ -8,6 +8,7 @@ from lcVisitor import lcVisitor
 import logging
 from telegram import Update
 from telegram.ext import filters, MessageHandler, ApplicationBuilder, CommandHandler, ContextTypes
+import pydot
 
 ######################### CLASSES i VARIABLES #########################
 
@@ -131,19 +132,19 @@ def evalExpr(expr):
             return False, Letter(letter), ''
 
 # Funció que retorna l'expressió amb la beta reducció aplicada
-def betareduction(var, absTerm, subs):
-    match absTerm:
+def betareduction(var, term, subs):
+    match term:
         case Application(left, right):
             redLeft= betareduction(var, left, subs)
             redRight = betareduction(var, right, subs)
             return  Application(redLeft, redRight)
-        case Abstraction(absVar, term):
+        case Abstraction(absVar, absTerm):
             if var != absVar:
-                redTerm= betareduction(var, term, subs)
+                redTerm= betareduction(var, absTerm, subs)
                 return Abstraction(absVar, redTerm)
             else:
                 #Per si de cas, però l'alfa-conversio se n'hauria d'encarregar
-                return Abstraction(absVar, term)
+                return Abstraction(absVar, absTerm)
         case Letter(letter):
             if letter == var:
                 return subs
@@ -246,24 +247,62 @@ def rename(term, conflict, newName, found):
             
 ######################### GRAFICAR #########################
 
+#Funció que donat un graf, un terme, un identificador i un diccionari de variables lligades, crea en 'graph' un graf de l'arbre semantic del terme (expressió)
+def generateGraph(graph, term, id, lligades):
+    match term:
+        case Application(left, right):
+            graph.add_node(pydot.Node(str(id), label = "@", shape="none"))
 
+            lastID1 = generateGraph(graph, left, id + 1, lligades)
+            graph.add_edge(pydot.Edge(str(id), str(id + 1)))
+
+            lastID2 = generateGraph(graph, right, lastID1 + 1, lligades)
+            graph.add_edge(pydot.Edge(str(id), str(lastID1 + 1)))
+
+            return lastID2
+        case Abstraction(var, absTerm):
+            graph.add_node(pydot.Node(str(id), label = "λ" + var, shape="none"))
+            auxID = -1
+            if var in lligades:
+                auxID = lligades[var]
+            lligades[var] = id
+
+            lastID = generateGraph(graph, absTerm, id + 1, lligades)
+            graph.add_edge(pydot.Edge(str(id), str(id + 1)))
+
+            if auxID != -1:
+                lligades[var] = auxID
+            else:
+                del lligades[var]
+
+            return lastID
+        case Letter(letter):
+            graph.add_node(pydot.Node(str(id), label = letter, shape="none"))
+            if letter in lligades:
+                graph.add_edge(pydot.Edge(str(id), str(lligades[letter]), style="dotted"))
+            return id
+
+def treeToGraph(expr):
+    graph = pydot.Dot("my_graph", graph_type="digraph")
+    lligades = dict()
+    generateGraph(graph, expr, 0, lligades)
+    graph.write_png("expression.png")
 
 ######################### BOT TELEGRAM #########################
+
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Benvingut, estas llest per fer lambda càlculs?!")
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Benvingut, estas llest per fer λ-càlculs?!")
 
 async def author(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Pol Mañé Roiger\nQP22/23-LP")
 
-
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text="/start\n/author\n/help\n/macros\nExpressió λ-càlcul")
-
 
 async def macros(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text=macrosToStr(macrosDictionary))
@@ -281,6 +320,8 @@ async def interact(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if expression != 'defMacro':
             textExpr = 'Arbre: \n' + treeToStr(expression)
             await context.bot.send_message(chat_id=update.effective_chat.id, text=textExpr)
+            treeToGraph(expression)
+            await context.bot.send_photo(chat_id=update.effective_chat.id, photo=open('expression.png', 'rb'))
 
             #Evaluator
             maxReductions = 10 #Maximum limit of reductions 
@@ -301,6 +342,8 @@ async def interact(update: Update, context: ContextTypes.DEFAULT_TYPE):
             else:
                 textResult = 'Resultat:\n' + treeToStr(reducedExpr)
                 await context.bot.send_message(chat_id=update.effective_chat.id, text=textResult)
+                treeToGraph(reducedExpr)
+                await context.bot.send_photo(chat_id=update.effective_chat.id, photo=open('expression.png', 'rb'))
     else:
         syntaxError = str(parser.getNumberOfSyntaxErrors()) + ' errors de sintaxi.'
         await context.bot.send_message(chat_id=update.effective_chat.id, text=syntaxError)
