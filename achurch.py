@@ -6,7 +6,7 @@ from lcParser import lcParser
 from lcVisitor import lcVisitor
 import logging
 from telegram import Update
-from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
+from telegram.ext import filters, MessageHandler, ApplicationBuilder, CommandHandler, ContextTypes
 
 @dataclass
 class Letter:
@@ -264,11 +264,36 @@ logging.basicConfig(
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Benvingut, estas llest per fer lambda càlculs?!")
 
+async def author(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Pol Mañé Roiger\nQP22/23-LP")
+
+
+async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="/start\n/author\n/help\n/macros\nExpressió λ-càlcul")
+
+
+async def macros(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=macrosToStr(macros))
+
+async def read(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=update.message.text)
+
 if __name__ == '__main__':
     TOKEN = open('token.txt').read().strip()
     application = ApplicationBuilder().token(TOKEN).build()
 
+    #Comandes del bot
     start_handler = CommandHandler('start', start)
+    help_handler = CommandHandler('help', help)
+    author_handler = CommandHandler('author', author)
+    macros_handler = CommandHandler('macros', macros)
+    #Interpreta els missatges de l'usuari que no siguin comandes i respon en conseqüència (és a dir, resol una lambda expressió)
+    read_handler = MessageHandler(filters.TEXT & (~filters.COMMAND), read)
+
     application.add_handler(start_handler)
+    application.add_handler(help_handler)
+    application.add_handler(author_handler)
+    application.add_handler(macros_handler)
+    application.add_handler(read_handler)
 
     application.run_polling()
