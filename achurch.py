@@ -108,11 +108,11 @@ def evalExpr(expr):
                 case Abstraction(var, absTerm):
                     [converted, absConverted] = alphaconversion(var, absTerm, right)
                     if converted:
-                        reduction = 'α-conversió:\n' + treeToStr(left) + ' → ' + treeToStr(absConverted)
+                        reduction = treeToStr(left) + ' →α→ ' + treeToStr(absConverted)
                         return True, Application(absConverted, right), reduction
                     else:
                         reducedExpr = betareduction(var, absTerm, right)
-                        reduction = 'β-reducció:\n' + treeToStr(expr) + ' → ' + treeToStr(reducedExpr)
+                        reduction = treeToStr(expr) + ' →β→ ' + treeToStr(reducedExpr)
                         return True, reducedExpr, reduction
                 case _:
                     [reduced, redLeft, reduction] = evalExpr(left)
@@ -151,7 +151,7 @@ def betareduction(var, absTerm, subs):
                 return Letter(letter)
 
 #Funció que verifica si es pot aplicar UNA alfa-conversió donat una abstracció(var i absTerm) i un terme, 
-# retorna l'ABSTRACCIO amb la conversió aplicada si s'escau, sinó retorna l'expressió d'entrada
+# retorna una ABSTRACCIO amb la conversió aplicada si s'escau, sinó retorna l'expressió d'entrada
 def alphaconversion(var, absTerm, rightTerm):
     abc = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'}
 
@@ -183,7 +183,7 @@ def alphaconversion(var, absTerm, rightTerm):
 # És un procés cíclic, la primera lletra del conjunt "serà" la següent de l'última
 def getNextFreeLetter(letter, freeLetters):
     first = True
-    firstFree = freeLetters.pop()
+    firstFree = ''
     for free in freeLetters:
         if first:
             firstFree = free
@@ -244,6 +244,10 @@ def rename(term, conflict, newName, found):
             else:
                 return Letter(letter)
             
+######################### GRAFICAR #########################
+
+
+
 ######################### BOT TELEGRAM #########################
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
