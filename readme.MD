@@ -29,7 +29,7 @@ pip install pydot
 sudo apt install graphviz
 ```
 
-PD: Cal recordar que necessitareu crear un Bot de Telegram, recomano que mireu la documentació Botfather (https://core.telegram.org/bots/tutorial, aquest és un breu tutorial per començar). Realment només necessiteu complir fins que us donin un 'TOKEN' que haureu de guardar en un fitxer en el mateix directori que els altres que es digui 'token.txt'.
+També necessitareu crear un Bot de Telegram, recomano que mireu la documentació Botfather (https://core.telegram.org/bots/tutorial, aquest és un breu tutorial per començar). Realment només necessiteu complir fins que us donin un 'TOKEN' que haureu de guardar en un fitxer en el mateix directori que els altres que es digui 'token.txt'.
 
 ## Execució
 Un cop comptem amb els fitxers del projecte porcedirem a executar-lo de la següent manera:
