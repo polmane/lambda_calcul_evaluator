@@ -296,7 +296,7 @@ logging.basicConfig(
 )
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="[AChurchBot a les seves ordres:]\nBenvingut! Llest per fer λ-càlculs!")
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Benvingut, estas llest per fer λ-càlculs?!")
 
 async def author(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Pol Mañé Roiger\nQP22/23-LP")
